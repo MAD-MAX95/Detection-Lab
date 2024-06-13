@@ -1,0 +1,91 @@
+from tkinter import *
+from tkinter import filedialog,messagebox
+from PIL import ImageTk,Image
+import os
+
+root=Tk()
+root.title("PIXEL MANIPULATION")
+root.resizable(0,0)
+root.geometry("400x500")
+
+def encrypted_image():
+  file1=filedialog.askopenfilename(filetypes=[('Image files','*.jpeg;*.jpg;*.png')])
+  if file1 is not None:
+     try:
+       #file_name=file1.name
+       key=int(e0.get())
+       #print(file_name,key)
+       with open(file1,'rb') as fi:
+         image=fi.read()
+       image=bytearray(image)
+       for index,values in enumerate(image):
+         image[index]=values^int(key)       
+       enc1=file1 + ".enc"
+       with open(enc1,'wb') as fi1:
+         fi1.write(image)
+       messagebox.showinfo("Success",f"File  {os.path.basename(file1)} encrypted successfully")
+       show_image(file1,enc1,is_encrypted=True)
+     except ValueError:
+       messagebox.showerror(f"Enter a valid integer key")
+     #except Exception as e:
+       #print(f"error {e}")
+
+def decrypted_image():
+  file1=filedialog.askopenfilename(filetypes=[('Encrypted file','*.enc')])
+  if file1 is not None:
+    try:
+      key=int(e0.get())
+      with open(file1,'rb') as fi:
+        image=fi.read()
+      image=bytearray(image)  
+      for index,values in enumerate(image):
+          image[index]=values^int(key)
+      originial_file=file1.replace(".enc",".decrypted.jpg")
+      with open(originial_file,'wb') as fi1:
+          fi1.write(image)
+      messagebox.showinfo("Success",f"File {os.path.basename(file1)} is decrypted successfully ")
+      show_image(originial_file,file1,is_encrypted=False)
+    except ValueError:
+      messagebox.showerror("Invalid! Enter a valid Key")
+
+
+def show_image(original_file,enc1,is_encrypted):
+  try:
+    image=Image.open(original_file)
+    image.thumbnail((200,200))
+    photo=ImageTk.PhotoImage(image)
+    label=Label(root,image=photo)
+    label.image=photo
+    label.place(x=100,y=200)
+
+    if is_encrypted:
+      msg=f"Encypted file saved as :\n{enc1}"
+    else:
+      msg=f"Decrypted file saved as:\n{enc1}"
+
+
+    en=Label(root,text=msg,fg='blue',font=("Arial",10))
+    en.place(x=50,y=450)
+  except Exception as e:
+    messagebox.showerror(f"error showing image :{e}")
+
+
+      
+
+
+f0=Frame(bg="blue")
+f0.place(x=0,y=0,width=400,height=500)
+
+l0=Label(root,text="IMAGE ENCRYPTION",bg='blue',fg='white',font=("Bold",15))
+l0.place(x=110,y=40)
+
+e0=Entry(root,font=('Impact',10))
+e0.place(x=135,y=90)
+
+b0=Button(root,text="ENCRYPT",command=encrypted_image) 
+b0.place(x=100,y=150,width=80,height=25)
+
+b1=Button(root,text="DECRYPT",command=decrypted_image)
+b1.place(x=220,y=150,width=80,height=25)
+
+root.mainloop()
